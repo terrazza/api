@@ -1,5 +1,5 @@
 api_platform:
-    title: Hello API Platform
+    title: Vehicle References Service
     version: 1.0.0
     mapping:
         paths: ['%kernel.project_dir%/src/Entity']
@@ -14,3 +14,9 @@ api_platform:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+
+    # Customized by Terrazza
+    # Allow using plain IDs for JSON format. (no IRIs)
+    # allow_plain_identifiers: false    
+    exception_to_status:
+        App\DataPersister\Exception\EntityRemoveRejectedException: 406

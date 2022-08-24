@@ -2,14 +2,19 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\BrandRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BrandRepository::class)]
+#[UniqueEntity('name')]
 #[ApiResource]
 class Brand
 {
@@ -20,12 +25,16 @@ class Brand
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[ApiFilter(SearchFilter::class)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 2,max: 255)]
     private $name;
 
     #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Model::class, orphanRemoval: true)]
     private $models;
 
     #[ORM\ManyToMany(targetEntity: SegmentGroup::class, inversedBy: 'brands')]
+    #[ApiFilter(SearchFilter::class)]
     private $segmentGroups;
 
     public function __construct()

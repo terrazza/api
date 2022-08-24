@@ -2,17 +2,21 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\SegmentGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: SegmentGroupRepository::class)]
+#[UniqueEntity('name')]
 #[ApiResource]
-class SegmentGroup
-{
+class SegmentGroup {
     #[ApiProperty(identifier: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -20,6 +24,9 @@ class SegmentGroup
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[ApiFilter(SearchFilter::class)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 2,max: 255)]
     private $name;
 
     #[ORM\ManyToMany(targetEntity: Brand::class, mappedBy: 'segmentGroups')]
@@ -31,6 +38,7 @@ class SegmentGroup
     public function __construct()
     {
         $this->brands = new ArrayCollection();
+        $this->models = new ArrayCollection();
     }
 
     public function getId(): ?int

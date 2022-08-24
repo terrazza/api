@@ -6,7 +6,6 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use App\Repository\BrandRepository;
 use App\Repository\ModelRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,7 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ModelRepository::class)]
 #[ApiResource]
 class Model {
-    CONST IRI="/models/";
     #[ApiProperty(identifier: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,6 +22,7 @@ class Model {
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[ApiFilter(SearchFilter::class)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 4,max: 255)]
     private $name;
@@ -106,7 +105,7 @@ class Model {
      * @Assert\IsFalse(message="given name already exists for given brand, #{{ value }}")
      */
     private function isUniqueModelName() {
-        foreach ($this->getBrand()->getModels() as $model) {
+        if ($this->getBrand()) foreach ($this->getBrand()->getModels() as $model) {
             if ($model->getName() === $this->name && $model->getId() !== $this->id) {
                 return $model->getId();
             }
